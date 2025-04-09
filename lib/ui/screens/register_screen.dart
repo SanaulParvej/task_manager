@@ -183,11 +183,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _registrationInProgress = false;
     setState(() {});
     if (response.isSuccess) {
+      _clearTextFields();
       showSnackBarMessage(context, 'User Registered Successfully!');
     } else {
       showSnackBarMessage(context, response.errorMessage, true);
     }
   }
+
+  void _clearTextFields(){
+    _emailTEController.clear();
+    _firstNameTEController.clear();
+    _lastNameTEController.clear();
+    _mobileTEController.clear();
+    _passwordTEController.clear();
+}
 
   void _onTapSignInButton() {
     Navigator.pop(context);
