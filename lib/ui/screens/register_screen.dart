@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:task_manager/data/service/network_client.dart';
 import 'package:task_manager/data/utils/urls.dart';
+import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/sanck_bar_message.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
 
@@ -120,9 +121,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 16),
                   Visibility(
                     visible: _registrationInProgress == false,
-                    replacement: Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                    replacement: CenteredCircularProgressIndicator(),
                     child: ElevatedButton(
                         onPressed: _onTapSubmitButton,
                         child: const Icon(Icons.arrow_circle_right_outlined)),
