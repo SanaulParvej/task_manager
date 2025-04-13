@@ -1,5 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/models/Login_model.dart';
+import 'package:task_manager/ui/controller/auth_controller.dart';
 import 'package:task_manager/ui/screens/forget_password_verify_email_screen.dart';
 import 'package:task_manager/ui/screens/main_bottom_nav_screen.dart';
 import 'package:task_manager/ui/screens/register_screen.dart';
@@ -125,6 +127,9 @@ class _LoginScreenState extends State<LoginScreen> {
     _loginInProgress = false;
     setState(() {});
     if (response.isSuccess) {
+      LoginModel loginModel = LoginModel.fromJson(response.data!);
+      AuthController.saveUserInformation(loginModel.token, loginModel.userModel);
+
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
