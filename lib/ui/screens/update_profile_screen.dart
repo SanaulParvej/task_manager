@@ -1,10 +1,14 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:task_manager/ui/controller/auth_controller.dart';
-import 'package:task_manager/ui/widgets/screen_background.dart';
-import 'package:task_manager/ui/widgets/tm_app_bar.dart';
-
 import '../../data/models/user_model.dart';
+import '../../data/service/network_client.dart';
+import '../../data/utils/urls.dart';
+import '../controller/auth_controller.dart';
+import '../widgets/center_circular_progress_indicator.dart';
+import '../widgets/sanck_bar_message.dart';
+import '../widgets/screen_background.dart';
+import '../widgets/tm_app_bar.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({super.key});
@@ -21,6 +25,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ImagePicker _imagePicker = ImagePicker();
+  bool _updateProfileInProgress = false;
   XFile? _pickedImage;
 
   @override
@@ -36,7 +41,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: TMAppBar(
+      appBar: const TMAppBar(
         fromProfileScreen: true,
       ),
       body: ScreenBackground(
@@ -49,30 +54,32 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(
-                    height: 32,
-                  ),
+                  const SizedBox(height: 32),
                   Text(
                     'Update Profile',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 24),
-                  buildPhotoPickerWidget(),
+                  _buildPhotoPickerWidget(),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _emailTEController,
                     textInputAction: TextInputAction.next,
                     keyboardType: TextInputType.emailAddress,
                     enabled: false,
-                    decoration: InputDecoration(hintText: 'Email'),
+                    decoration: const InputDecoration(
+                        hintText: 'Email'
+                    ),
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _firstNameTEController,
                     textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(hintText: 'First name'),
-                    validator: (String? value){
-                      if(value?.trim().isEmpty??true){
+                    decoration: const InputDecoration(
+                        hintText: 'First name'
+                    ),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
                         return 'Enter your first name';
                       }
                       return null;
@@ -82,9 +89,11 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   TextFormField(
                     controller: _lastNameTEController,
                     textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(hintText: 'Last name'),
-                    validator: (String? value){
-                      if(value?.trim().isEmpty??true){
+                    decoration: const InputDecoration(
+                        hintText: 'Last name'
+                    ),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
                         return 'Enter your last name';
                       }
                       return null;
@@ -95,8 +104,10 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     controller: _mobileTEController,
                     textInputAction: TextInputAction.next,
                     keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(hintText: 'Phone'),
-                    validator: (String? value){
+                    decoration: const InputDecoration(
+                        hintText: 'Phone'
+                    ),
+                    validator: (String? value) {
                       String phone = value?.trim() ?? '';
                       RegExp regExp = RegExp(r"^(?:\+?88|0088)?01[15-9]\d{8}$");
                       if (regExp.hasMatch(phone) == false) {
@@ -109,12 +120,19 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   TextFormField(
                     obscureText: true,
                     controller: _passwordTEController,
-                    decoration: InputDecoration(hintText: 'Password'),
+                    decoration: const InputDecoration(
+                        hintText: 'Password'
+                    ),
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
+                  Visibility(
+                    visible: _updateProfileInProgress == false,
+                    replacement: const CenteredCircularProgressIndicator(),
+                    child: ElevatedButton(
                       onPressed: _onTapSubmitButton,
-                      child: const Icon(Icons.arrow_circle_right_outlined)),
+                      child: const Icon(Icons.arrow_circle_right_outlined),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -125,12 +143,48 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   }
 
   void _onTapSubmitButton() {
-    if(_formKey.currentState!.validate()){
-      //update profile
+    if (_formKey.currentState!.validate()) {
+      _updateProfile();
     }
   }
 
-  Widget buildPhotoPickerWidget() {
+  Future<void> _updateProfile() async {
+    _updateProfileInProgress = true;
+    setState(() {});
+    Map<String, dynamic> requestBody = {
+      "email": _emailTEController.text.trim(),
+      "firstName": _firstNameTEController.text.trim(),
+      "lastName": _lastNameTEController.text.trim(),
+      "mobile": _mobileTEController.text.trim(),
+    };
+
+    if (_passwordTEController.text.isNotEmpty) {
+      requestBody["password"] = _passwordTEController.text;
+    }
+
+    if (_pickedImage != null) {
+      List<int> imageBytes = await _pickedImage!.readAsBytes();
+      String encodedImage = base64Encode(imageBytes);
+      requestBody['photo'] = encodedImage;
+    }
+
+    NetworkResponse response = await NetworkClient.postRequest(
+      url: Urls.updateProfileUrl,
+      body: requestBody,
+    );
+
+    _updateProfileInProgress = false;
+    setState(() {});
+    if (response.isSuccess) {
+
+      _passwordTEController.clear();
+      showSnackBarMessage(context, 'User data updated successfully!');
+    } else {
+      showSnackBarMessage(context, response.errorMessage, true);
+    }
+  }
+
+  Widget _buildPhotoPickerWidget() {
     return GestureDetector(
       onTap: _onTapPhotoPicker,
       child: Container(
@@ -142,22 +196,20 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
             Container(
               height: 50,
               width: 80,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   color: Colors.grey,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(8),
                     bottomLeft: Radius.circular(8),
                   )),
               alignment: Alignment.center,
-              child: Text(
+              child: const Text(
                 'Photo',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
+                style: TextStyle(color: Colors.white),
               ),
             ),
-            SizedBox(width: 8),
-            Text(_pickedImage?.name??'Select Your photo')
+            const SizedBox(width: 8),
+            Text(_pickedImage?.name ?? 'Select your photo')
           ],
         ),
       ),

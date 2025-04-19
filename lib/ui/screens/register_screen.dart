@@ -1,11 +1,11 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/service/network_client.dart';
-import 'package:task_manager/data/utils/urls.dart';
-import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
-import 'package:task_manager/ui/widgets/sanck_bar_message.dart';
-import 'package:task_manager/ui/widgets/screen_background.dart';
+import '../../data/service/network_client.dart';
+import '../../data/utils/urls.dart';
+import '../widgets/center_circular_progress_indicator.dart';
+import '../widgets/sanck_bar_message.dart';
+import '../widgets/screen_background.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -36,9 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(
-                    height: 80,
-                  ),
+                  const SizedBox(height: 80),
                   Text(
                     'Join With Us',
                     style: Theme.of(context).textTheme.titleLarge,
@@ -48,7 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     textInputAction: TextInputAction.next,
                     keyboardType: TextInputType.emailAddress,
                     controller: _emailTEController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Email',
                     ),
                     validator: (String? value) {
@@ -63,7 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     textInputAction: TextInputAction.next,
                     controller: _firstNameTEController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'First name',
                     ),
                     validator: (String? value) {
@@ -77,7 +75,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     textInputAction: TextInputAction.next,
                     controller: _lastNameTEController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Last name',
                     ),
                     validator: (String? value) {
@@ -92,7 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     textInputAction: TextInputAction.next,
                     keyboardType: TextInputType.phone,
                     controller: _mobileTEController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Mobile',
                     ),
                     validator: (String? value) {
@@ -106,9 +104,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
-                    textInputAction: TextInputAction.next,
                     controller: _passwordTEController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Password',
                     ),
                     validator: (String? value) {
@@ -121,25 +118,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 16),
                   Visibility(
                     visible: _registrationInProgress == false,
-                    replacement: CenteredCircularProgressIndicator(),
+                    replacement: const CenteredCircularProgressIndicator(),
                     child: ElevatedButton(
-                        onPressed: _onTapSubmitButton,
-                        child: const Icon(Icons.arrow_circle_right_outlined)),
+                      onPressed: _onTapSubmitButton,
+                      child: const Icon(Icons.arrow_circle_right_outlined),
+                    ),
                   ),
                   const SizedBox(height: 32),
                   Center(
                     child: RichText(
                       text: TextSpan(
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black54,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
                         children: [
-                          TextSpan(text: "Already have an account? "),
+                          const TextSpan(text: "Already have an account? "),
                           TextSpan(
-                            text: "Sign In",
-                            style: TextStyle(
+                            text: 'Sign In',
+                            style: const TextStyle(
                               color: Colors.green,
                               fontWeight: FontWeight.bold,
                             ),
@@ -173,7 +171,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       "firstName": _firstNameTEController.text.trim(),
       "lastName": _lastNameTEController.text.trim(),
       "mobile": _mobileTEController.text.trim(),
-      "password": _passwordTEController.text,
+      "password": _passwordTEController.text
     };
     NetworkResponse response = await NetworkClient.postRequest(
       url: Urls.registerUrl,
@@ -183,19 +181,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() {});
     if (response.isSuccess) {
       _clearTextFields();
-      showSnackBarMessage(context, 'User Registered Successfully!');
+      showSnackBarMessage(context, 'User registered successfully!');
     } else {
       showSnackBarMessage(context, response.errorMessage, true);
     }
   }
 
-  void _clearTextFields(){
+  void _clearTextFields() {
     _emailTEController.clear();
     _firstNameTEController.clear();
     _lastNameTEController.clear();
     _mobileTEController.clear();
     _passwordTEController.clear();
-}
+  }
 
   void _onTapSignInButton() {
     Navigator.pop(context);
