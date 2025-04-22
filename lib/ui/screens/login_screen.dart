@@ -7,10 +7,10 @@ import 'package:task_manager/ui/screens/main_bottom_nav_screen.dart';
 import 'package:task_manager/ui/screens/register_screen.dart';
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
-
 import '../../data/service/network_client.dart';
 import '../../data/utils/urls.dart';
 import '../widgets/sanck_bar_message.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

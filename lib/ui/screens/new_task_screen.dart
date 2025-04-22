@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/models/task_status_count_list_model.dart';
+import 'package:task_manager/data/models/task_status_count_model.dart';
+import 'package:task_manager/data/service/network_client.dart';
 import 'package:task_manager/ui/screens/add_new_task_screen.dart';
+import 'package:task_manager/ui/widgets/sanck_bar_message.dart';
+import '../../data/utils/urls.dart';
 import '../widgets/summary_card.dart';
 import '../widgets/task_card.dart';
 
@@ -11,6 +16,15 @@ class NewTaskScreen extends StatefulWidget {
 }
 
 class _NewTaskScreenState extends State<NewTaskScreen> {
+  bool _getStatusCountInProgress = false;
+  List<TaskStatusCountModel> _taskStatusCountList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getAllTaskStatusCount();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,33 +60,36 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     );
   }
 
-
   Widget buildSummerySection() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            SummaryCard(
-              tittle: 'New',
-              count: 12,
-            ),
-            SummaryCard(
-              tittle: 'Progress',
-              count: 20,
-            ),
-            SummaryCard(
-              tittle: 'Completed',
-              count: 7,
-            ),
-            SummaryCard(
-              tittle: 'Cancelled',
-              count: 9,
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        height: 100,
+        child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _taskStatusCountList.length,
+            itemBuilder: (context, index) {
+              return SummaryCard(
+                  tittle: _taskStatusCountList[index].status,
+                  count: _taskStatusCountList[index].count);
+            }),
       ),
     );
+  }
+
+  Future<void> _getAllTaskStatusCount() async {
+    _getStatusCountInProgress = true;
+    setState(() {});
+    final NetworkResponse response =
+        await NetworkClient.getRequest(url: Urls.taskStatusCountUrl);
+    if (response.isSuccess) {
+      TaskStatusCountListModel taskStatusCountListModel =
+          TaskStatusCountListModel.fromJson(response.data ?? {});
+      _taskStatusCountList = taskStatusCountListModel.statusCountList;
+    } else {
+      showSnackBarMessage(context, response.errorMessage, true);
+    }
+    _getStatusCountInProgress = false;
+    setState(() {});
   }
 }
