@@ -6,7 +6,7 @@ import '../../data/service/network_client.dart';
 import '../../data/utils/urls.dart';
 import '../controller/auth_controller.dart';
 import '../widgets/center_circular_progress_indicator.dart';
-import '../widgets/sanck_bar_message.dart';
+import '../widgets/snack_bar_message.dart';
 import '../widgets/screen_background.dart';
 import '../widgets/tm_app_bar.dart';
 

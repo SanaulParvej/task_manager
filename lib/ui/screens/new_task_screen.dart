@@ -6,7 +6,7 @@ import 'package:task_manager/data/models/task_status_count_model.dart';
 import 'package:task_manager/data/service/network_client.dart';
 import 'package:task_manager/ui/screens/add_new_task_screen.dart';
 import 'package:task_manager/ui/widgets/center_circular_progress_indicator.dart';
-import 'package:task_manager/ui/widgets/sanck_bar_message.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 import '../../data/utils/urls.dart';
 import '../widgets/summary_card.dart';
 import '../widgets/task_card.dart';

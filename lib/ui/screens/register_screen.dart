@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../data/service/network_client.dart';
 import '../../data/utils/urls.dart';
 import '../widgets/center_circular_progress_indicator.dart';
-import '../widgets/sanck_bar_message.dart';
+import '../widgets/snack_bar_message.dart';
 import '../widgets/screen_background.dart';
 
 class RegisterScreen extends StatefulWidget {

@@ -6,7 +6,7 @@ enum TaskStatus {
   sNew,
   progress,
   completed,
-  canclled,
+  cancelled,
 }
 
 class TaskCard extends StatelessWidget {
@@ -71,7 +71,7 @@ class TaskCard extends StatelessWidget {
         color = Colors.purple;
       case TaskStatus.completed:
         color = Colors.green;
-      case TaskStatus.canclled:
+      case TaskStatus.cancelled:
         color = Colors.red;
     }
     return color;
