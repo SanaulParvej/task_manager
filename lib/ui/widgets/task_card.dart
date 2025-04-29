@@ -17,7 +17,8 @@ class TaskCard extends StatefulWidget {
   const TaskCard({
     super.key,
     required this.taskStatus,
-    required this.taskModel, required this.refreshList,
+    required this.taskModel,
+    required this.refreshList,
   });
 
   final TaskStatus taskStatus;
@@ -69,7 +70,10 @@ class _TaskCardState extends State<TaskCard> {
                   replacement: CenteredCircularProgressIndicator(),
                   child: Row(
                     children: [
-                      IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
+                      IconButton(
+                        onPressed: _deleteTask,
+                        icon: Icon(Icons.delete),
+                      ),
                       IconButton(
                           onPressed: _showUpdateStatusDialog,
                           icon: Icon(Icons.edit)),
@@ -161,6 +165,20 @@ class _TaskCardState extends State<TaskCard> {
     setState(() {});
     final NetworkResponse response = await NetworkClient.getRequest(
         url: Urls.updateTaskStatusUrl(widget.taskModel.id, status));
+    _inProgress = false;
+    if (response.isSuccess) {
+      widget.refreshList();
+    } else {
+      setState(() {});
+      showSnackBarMessage(context, response.errorMessage, true);
+    }
+  }
+
+  Future<void> _deleteTask() async {
+    _inProgress = true;
+    setState(() {});
+    final NetworkResponse response = await NetworkClient.getRequest(
+        url: Urls.deleteTaskUrl(widget.taskModel.id));
     _inProgress = false;
     if (response.isSuccess) {
       widget.refreshList();
